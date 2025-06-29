@@ -152,8 +152,12 @@ function listEmails(index) {
 
             document.getElementById("letterInfo").innerHTML = `From: ${from}<br>Subject: ${subject}`;
 
-            document.getElementById("backArrow").style.display = (index > 0) ? "block" : "none";
-            document.getElementById("nextArrow").style.display = (index < messageList.length - 1) ? "block" : "none";
+            document.getElementById("backArrow").style.display =
+                index > 0 || prevPageTokens.length > 1 ? "block" : "none";
+
+            document.getElementById("nextArrow").style.display =
+                index < messageList.length - 1 || nextPageToken ? "block" : "none";
+
         })
         .catch(err => log("Error loading message: " + err.message))
         .finally(() => {
