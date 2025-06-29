@@ -5,6 +5,7 @@ let n = 0;
 let currentMessageId;
 let isLoadingMail = false;
 let isFetchingEmail = false;
+let lastKeyTime = 0;
 
 
 function login() {
@@ -22,6 +23,10 @@ function login() {
 }
 
 document.addEventListener('keydown', (e) => {
+    const now = Date.now();
+    if (now - lastKeyTime < 150) return;
+    lastKeyTime = now;
+
     if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
         return;
     }
