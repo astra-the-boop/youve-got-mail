@@ -111,12 +111,12 @@ async function prevEmail() {
         document.getElementById('audio').play();
         n--;
         if (n < 0) {
-            if (prevPageTokens.length > 1) {
-                prevPageTokens.pop();
+            if (prevPageTokens.length > 0) {
                 const prevToken = prevPageTokens.pop();
                 await fetchMessageList("", prevToken);
                 n = messageList.length - 1;
-            } else {
+            }
+             else {
                 log("You're at the first message.");
                 n = 0;
             }
@@ -153,7 +153,7 @@ function listEmails(index) {
             document.getElementById("letterInfo").innerHTML = `From: ${from}<br>Subject: ${subject}`;
 
             document.getElementById("backArrow").style.display =
-                index > 0 || prevPageTokens.length > 1 ? "block" : "none";
+                index > 0 || prevPageTokens.length > 0 ? "block" : "none";
 
             document.getElementById("nextArrow").style.display =
                 index < messageList.length - 1 || nextPageToken ? "block" : "none";
