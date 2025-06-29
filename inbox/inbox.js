@@ -207,10 +207,38 @@ async function showMail() {
             log("No body content found.");
             return;
         }
+        const inlineImages = {};
 
         let decoded = decodeBase64Url(bodyData);
+        for (const part of parts) {
+            if (part.body?.attachmentId && part.headers) {
+                const cidHeader = part.headers.find(h => h.name.toLowerCase() === 'content-id');
+                if (cidHeader) {
+                    const cid = cidHeader.value.replace(/[<>]/g, '');
+                    const mimeType = part.mimeType;
+                    const filename = part.filename || `${cid}.${mimeType.split('/')[1]}`;
+                    const base64 = await fetchAttachment(currentMessageId, part.body.attachmentId);
 
-        // decoded = decoded.replace(/cid:([^'">]+)/g, '[image]');
+                    const byteCharacters = decodeBase64Url(base64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: mimeType });
+                    const url = URL.createObjectURL(blob);
+
+                    inlineImages[cid] = `<a href="${url}" download="${filename}">📸 ${filename}</a>`;
+                }
+            }
+        }
+
+// Replace <img src="cid:..."> tags with download links
+        decoded = decoded.replace(/<img[^>]+src=["']cid:([^"']+)["'][^>]*>/gi, (_, cid) => {
+            return inlineImages[cid] || '[image]';
+        });
+
+
 
         const attachments = parts.filter(p =>
             p.body?.attachmentId && !p.headers?.some(h => h.name.toLowerCase() === 'content-id')
