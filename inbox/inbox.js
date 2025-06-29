@@ -210,22 +210,7 @@ async function showMail() {
 
         let decoded = decodeBase64Url(bodyData);
 
-        const inlineImages = {};
-        for (const part of parts) {
-            if (part.body?.attachmentId && part.headers) {
-                const cidHeader = part.headers.find(h => h.name.toLowerCase() === 'content-id');
-                if (cidHeader) {
-                    const cid = cidHeader.value.replace(/[<>]/g, '');
-                    const contentType = part.mimeType;
-                    const attachmentData = await fetchAttachment(currentMessageId, part.body.attachmentId);
-                    inlineImages[cid] = `data:${contentType};base64,${attachmentData}`;
-                }
-            }
-        }
-
-        decoded = decoded.replace(/cid:([^'">]+)/g, (match, cid) => {
-            return inlineImages[cid] || match;
-        });
+        // decoded = decoded.replace(/cid:([^'">]+)/g, '[image]');
 
         const attachments = parts.filter(p =>
             p.body?.attachmentId && !p.headers?.some(h => h.name.toLowerCase() === 'content-id')
@@ -245,16 +230,7 @@ async function showMail() {
             const blob = new Blob([byteArray], { type: mimeType });
             const url = URL.createObjectURL(blob);
 
-            if (mimeType.startsWith("image/")) {
-                return `
-            <div style="margin-top:1rem">
-                <p><strong>${filename}</strong></p>
-                <img src="${url}" alt="${filename}" style="max-width:100%; height:auto; border:1px solid #ccc; margin-bottom: 0.5rem;"><br>
-                <a href="${url}" download="${filename}">📎 Download ${filename}</a>
-            </div>`;
-            } else {
-                return `<p><a href="${url}" download="${filename}">📎 ${filename}</a></p>`;
-            }
+            return `<p><a href="${url}" download="${filename}">📎 Download ${filename}</a></p>`;
         }));
 
         document.getElementById("emailContents").innerHTML = decoded + attachmentHTML.join("");
