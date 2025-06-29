@@ -9,6 +9,15 @@ document.getElementById("mail").addEventListener("keydown", (e) => {
     }
 })
 
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
+        return;
+    }
+
+    if(e.key === "/"){
+        alert(`/: Shortcuts list\n\nInbox:\n<— : Previous\n—>: Next\nEnter/Return: Select\nEsc: Back\n\nCompose:\nCtrl/Cmd + Enter/Return: Send email`)
+    }});
+
 function login() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,

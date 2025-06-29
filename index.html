@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <title>You've Got Mail!</title>
 </head>
+<script>
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
+            return;
+        }
+
+        if(e.key === "/"){
+            alert(`/: Shortcuts list\n\nInbox:\n<— : Previous\n—>: Next\nEnter/Return: Select\nEsc: Back\n\nCompose:\nCtrl/Cmd + Enter/Return: Send email`)
+        }});
+</script>
 <body style="background-color: #bbd3e8">
 <img src="img/home.png" style="image-rendering: pixelated;position: fixed; top:0; width: 100%; left: 0">
 <a href="compose"><img src="img/penandpaper.png" style="position: fixed; bottom: 0; left: 0; width: 30rem; image-rendering: pixelated"></a>
 <a href="inbox"><img src="img/mailbox.png" style="position: fixed; bottom: 0; right: -5rem; width: 30rem; image-rendering: pixelated"></a>
-
+<h2 style="position:fixed; font-size: 4rem; margin-left: 30%; bottom: 1rem; background-color: white" onclick="alert(`/: Shortcuts list\n\nInbox:\n<— : Previous\n—>: Next\nEnter/Return: Select\nEsc: Back\n\nCompose:\nCtrl/Cmd + Enter/Return: Send email`)">[ shortcuts list :3 ]</h2>
 </body>
 </html>

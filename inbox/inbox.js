@@ -36,6 +36,9 @@ document.addEventListener('keydown', (e) => {
     if(e.key === "Enter"){
         showMail();
     }
+    if(e.key === "/"){
+        alert(`/: Shortcuts list\n\nInbox:\n<— : Previous\n—>: Next\nEnter/Return: Select\nEsc: Back\n\nCompose:\nCtrl/Cmd + Enter/Return: Send email`)
+    }
 })
 
 async function fetchMessageList() {
