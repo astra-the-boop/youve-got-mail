@@ -6,8 +6,8 @@ let currentMessageId;
 let isLoadingMail = false;
 let isFetchingEmail = false;
 let lastKeyTime = 0;
-let originalMessageList = [];
-
+let nextPageToken = null;
+let prevPageTokens = [];
 
 function login() {
     tokenClient = google.accounts.oauth2.initTokenClient({
@@ -53,23 +53,40 @@ document.addEventListener('keydown', (e) => {
     }
 })
 
-async function fetchMessageList(query = "") {
-    const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100&q=${encodeURIComponent(query)}`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
+async function fetchMessageList(query = "", pageToken ='') {
+    const url = new URL("https://gmail.googleapis.com/gmail/v1/users/me/messages");
+    url.searchParams.set("maxResults", '100');
+    if (query) url.searchParams.set("q", query);
+    if (pageToken) url.searchParams.set("pageToken", pageToken);
+
+    const res = await fetch(url.toString(),{
+        headers: {Authorization: `Bearer ${accessToken}` }
     });
+
     const data = await res.json();
     messageList = data.messages || [];
+    nextPageToken = data.nextPageToken || null;
 }
 
 
-function nextEmail() {
-    if(document.getElementById("mailPreview").style.display !== "none"){
-    document.getElementById('audio').play();
-    n++;
-    listEmails(n);}
-
-
+async function nextEmail() {
+    if (document.getElementById("mailPreview").style.display !== "none") {
+        document.getElementById('audio').play();
+        n++;
+        if (n >= messageList.length) {
+            if (nextPageToken) {
+                prevPageTokens.push(nextPageToken);
+                await fetchMessageList("", nextPageToken);
+                n = 0;
+            } else {
+                log("No more messages.");
+                n = messageList.length - 1;
+            }
+        }
+        listEmails(n);
+    }
 }
+
 
 async function searchEmails() {
     const query = document.getElementById("searchInput").value;
@@ -89,14 +106,25 @@ async function searchEmails() {
 
 
 
-function prevEmail() {
-    if(document.getElementById("mailPreview").style.display !== "none"){
-    document.getElementById('audio').play();
-    if (n > 0) {
+async function prevEmail() {
+    if (document.getElementById("mailPreview").style.display !== "none") {
+        document.getElementById('audio').play();
         n--;
+        if (n < 0) {
+            if (prevPageTokens.length > 1) {
+                prevPageTokens.pop();
+                const prevToken = prevPageTokens.pop();
+                await fetchMessageList("", prevToken);
+                n = messageList.length - 1;
+            } else {
+                log("You're at the first message.");
+                n = 0;
+            }
+        }
         listEmails(n);
-    }}
+    }
 }
+
 
 function listEmails(index) {
     if (isFetchingEmail) return;
