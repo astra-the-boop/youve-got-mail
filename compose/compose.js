@@ -74,7 +74,7 @@ function sendMail() {
 
 
     document.getElementById("mail").value = `    /\\_/\\           ___
-   = o_o =_______    \\ \\  < Thanks for using You've Got Mail! )
+   = o_o =_______    \\ \\  < Thanks for using You've Got Mail! Nya~ <3 )
     __^      __(  \\.__) )
 (@)<_____>__(_____)____/`;
 }

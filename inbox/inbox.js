@@ -73,12 +73,13 @@ function listEmails(index) {
     }
 
     const msg = messageList[index];
-    currentMessageId = msg.id;
     fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata`, {
         headers: { Authorization: `Bearer ${accessToken}` }
     })
         .then(res => res.json())
         .then(email => {
+            currentMessageId = msg.id;
+
             const headers = email.payload.headers;
             const from = headers.find(h => h.name === "From")?.value;
             const subject = headers.find(h => h.name === "Subject")?.value;
@@ -88,12 +89,14 @@ function listEmails(index) {
             document.getElementById("nextArrow").style.display = (index < messageList.length - 1) ? "block" : "none";
         })
         .catch(err => log("Error loading message: " + err.message));
+
 }
 
-function showMail(){
+function showMail() {
     document.getElementById('audio').play();
     document.getElementById("mailPreview").style.display = "none";
     document.getElementById("emailContentsContainer").style.display = "block";
+
     if (!accessToken || !currentMessageId) return log("No message selected");
 
     fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${currentMessageId}?format=full`, {
@@ -101,26 +104,46 @@ function showMail(){
     })
         .then(res => res.json())
         .then(data => {
-            const parts = data.payload.parts;
-            let bodyData = "";
+            const parts = getPartsRecursively(data.payload);
+            const htmlPart = parts.find(p => p.mimeType === "text/html");
+            const plainPart = parts.find(p => p.mimeType === "text/plain");
 
-            if (parts && parts.length) {
-                const plainPart = parts.find(part => part.mimeType === "text/plain");
-                const htmlPart = parts.find(part => part.mimeType === "text/html");
-                const chosenPart = plainPart || htmlPart || parts[0];
-                bodyData = chosenPart.body.data;
-            } else {
-                bodyData = data.payload.body.data;
-            }
+            const bodyData =
+                htmlPart?.body?.data || plainPart?.body?.data || data.payload.body?.data;
 
-            if (!bodyData) return log("No body content found");
+            if (!bodyData) return log("No body content found.");
 
-            const decoded = atob(bodyData.replace(/-/g, '+').replace(/_/g, '/'));
-            console.log("Message Content:\n", decoded);
+            console.log("bodyData:", bodyData);
+
+            const decoded = decodeBase64Url(bodyData);
 
             document.getElementById("emailContents").innerHTML = decoded;
+
+            log("Email content loaded.");
         })
         .catch(err => log("Error fetching message content: " + err.message));
+}
+
+
+function getPartsRecursively(data) {
+    const all = [];
+    (function recurse(p){
+        if (p.parts) p.parts.forEach(recurse);
+        else all.push(p);
+    })(data);
+    console.log(JSON.stringify(data.payload, null, 2));
+    return all;
+}
+
+function decodeBase64Url(data) {
+    const fixed = data.replace(/-/g, '+').replace(/_/g,'/');
+    const padding = '='.repeat((fixed.length - 4)%4);
+    try{
+        return atob(fixed+padding);
+    }catch(e){
+        console.error('failed to decode',e.message);
+        return 'error decoding body'
+    }
 }
 
 
