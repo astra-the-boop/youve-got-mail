@@ -43,7 +43,7 @@ function listEmails(index) {
     if (!accessToken) return log("⚠️ Not signed in");
     if (!messageList.length) return log("📭 No messages loaded.");
     if (index >= messageList.length) {
-        log("📭 No more messages.");
+        log("No more messages.");
         return;
     }
 
@@ -59,23 +59,22 @@ function listEmails(index) {
             const subject = headers.find(h => h.name === "Subject")?.value;
             document.getElementById("letterInfo").innerHTML = `From: ${from}<br>Subject: ${subject}`;
 
-            // Show/hide arrows
             document.getElementById("backArrow").style.display = (index > 0) ? "block" : "none";
             document.getElementById("nextArrow").style.display = (index < messageList.length - 1) ? "block" : "none";
         })
-        .catch(err => log("❌ Error loading message: " + err.message));
+        .catch(err => log("Error loading message: " + err.message));
 }
 
 function showMail(){
     document.getElementById("mailPreview").style.display = "none";
-    if (!accessToken || !currentMessageId) return log("⚠️ No message selected");
+    document.getElementById("emailContentsContainer").style.display = "block";
+    if (!accessToken || !currentMessageId) return log("No message selected");
 
     fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${currentMessageId}?format=full`, {
         headers: { Authorization: `Bearer ${accessToken}` }
     })
         .then(res => res.json())
         .then(data => {
-            // Gmail messages have a payload structure — look for plain text or HTML
             const parts = data.payload.parts;
             let bodyData = "";
 
@@ -88,17 +87,18 @@ function showMail(){
                 bodyData = data.payload.body.data;
             }
 
-            if (!bodyData) return log("⚠️ No body content found");
+            if (!bodyData) return log("No body content found");
 
-            // Gmail uses base64url encoding
             const decoded = atob(bodyData.replace(/-/g, '+').replace(/_/g, '/'));
-            console.log("📩 Message Content:\n", decoded);
+            console.log("Message Content:\n", decoded);
+
+            document.getElementById("emailContents").innerHTML = decoded;
         })
-        .catch(err => log("❌ Error fetching message content: " + err.message));
+        .catch(err => log("Error fetching message content: " + err.message));
 }
 
 function sendMail() {
-    if (!accessToken) return log("⚠️ Not signed in");
+    if (!accessToken) return log("Not signed in");
 
     const email = [
         "To: your.email@example.com",
@@ -119,11 +119,11 @@ function sendMail() {
     })
         .then(res => res.json())
         .then(data => {
-            if (data.id) log("✅ Email sent! ID: " + data.id);
-            else log("❌ Failed to send");
+            if (data.id) log("Email sent! ID: " + data.id);
+            else log("Failed to send");
         });
 }
 
 function log(msg) {
-    console.log(msg); // ✅ useful for debugging
+    console.log(msg);
 }
