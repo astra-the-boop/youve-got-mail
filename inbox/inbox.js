@@ -97,32 +97,6 @@ function showMail(){
         .catch(err => log("Error fetching message content: " + err.message));
 }
 
-function sendMail() {
-    if (!accessToken) return log("Not signed in");
-
-    const email = [
-        "To: your.email@example.com",
-        "Subject: Hello from JS!",
-        "",
-        "This was sent using the Gmail API + frontend only!"
-    ].join("\r\n");
-
-    const encoded = btoa(email).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
-    fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ raw: encoded })
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.id) log("Email sent! ID: " + data.id);
-            else log("Failed to send");
-        });
-}
 
 function log(msg) {
     console.log(msg);
