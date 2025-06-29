@@ -70,6 +70,13 @@ function sendMail() {
             if (data.id) alert("Email sent! ID: " + data.id);
             else log("Failed to send");
         });
+
+
+
+    document.getElementById("mail").value = `    /\\_/\\           ___
+   = o_o =_______    \\ \\  < Thanks for using You've Got Mail! )
+    __^      __(  \\.__) )
+(@)<_____>__(_____)____/`;
 }
 
 function log(msg) {
