@@ -9,4 +9,5 @@ A playful, 90s-kids-software themed Gmail client!
 - Reading and writing, and sending emails
 - Multiple recipients (CC, BCC)
 - Keyboard shortcuts!
+- Email searching for sender and subject
 - Nya~

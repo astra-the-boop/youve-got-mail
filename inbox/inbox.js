@@ -178,7 +178,7 @@ function showFullEmail() {
 
 let isShowingEmail = false;
 
-function showMail() {
+async function showMail() {
     if (isShowingEmail) return;
     isShowingEmail = true;
 
@@ -192,29 +192,68 @@ function showMail() {
         return;
     }
 
-    fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${currentMessageId}?format=full`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-    })
-        .then(res => res.json())
-        .then(data => {
-            const parts = getPartsRecursively(data.payload);
-            const htmlPart = parts.find(p => p.mimeType === "text/html");
-            const plainPart = parts.find(p => p.mimeType === "text/plain");
-            const bodyData = htmlPart?.body?.data || plainPart?.body?.data || data.payload.body?.data;
-
-            if (!bodyData) {
-                log("No body content found.");
-                return;
-            }
-
-            const decoded = decodeBase64Url(bodyData);
-            document.getElementById("emailContents").innerHTML = decoded;
-            log("Email content loaded.");
-        })
-        .catch(err => log("Error fetching message content: " + err.message))
-        .finally(() => {
-            isShowingEmail = false;
+    try {
+        const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${currentMessageId}?format=full`, {
+            headers: { Authorization: `Bearer ${accessToken}` }
         });
+        const data = await res.json();
+
+        const parts = getPartsRecursively(data.payload);
+        const htmlPart = parts.find(p => p.mimeType === "text/html");
+        const plainPart = parts.find(p => p.mimeType === "text/plain");
+        let bodyData = htmlPart?.body?.data || plainPart?.body?.data || data.payload.body?.data;
+
+        if (!bodyData) {
+            log("No body content found.");
+            return;
+        }
+
+        let decoded = decodeBase64Url(bodyData);
+
+        const inlineImages = {};
+        for (const part of parts) {
+            if (part.body?.attachmentId && part.headers) {
+                const cidHeader = part.headers.find(h => h.name.toLowerCase() === 'content-id');
+                if (cidHeader) {
+                    const cid = cidHeader.value.replace(/[<>]/g, '');
+                    const contentType = part.mimeType;
+                    const attachmentData = await fetchAttachment(currentMessageId, part.body.attachmentId);
+                    inlineImages[cid] = `data:${contentType};base64,${attachmentData}`;
+                }
+            }
+        }
+
+        decoded = decoded.replace(/cid:([^'">]+)/g, (match, cid) => {
+            return inlineImages[cid] || match;
+        });
+
+        const attachments = parts.filter(p =>
+            p.body?.attachmentId && !p.headers?.some(h => h.name.toLowerCase() === 'content-id')
+        );
+
+        const attachmentHTML = await Promise.all(attachments.map(async (att) => {
+            const filename = att.filename || "attachment";
+            const mimeType = att.mimeType;
+            const data = await fetchAttachment(currentMessageId, att.body.attachmentId);
+            return `<p><a download="${filename}" href="data:${mimeType};base64,${data}">📎 ${filename}</a></p>`;
+        }));
+
+        document.getElementById("emailContents").innerHTML = decoded + attachmentHTML.join("");
+
+        log("Email content loaded.");
+    } catch (err) {
+        log("Error fetching message content: " + err.message);
+    } finally {
+        isShowingEmail = false;
+    }
+}
+
+async function fetchAttachment(messageId, attachmentId) {
+    const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/attachments/${attachmentId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    const data = await res.json();
+    return data.data; // already base64 encoded
 }
 
 
