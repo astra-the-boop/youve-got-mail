@@ -1,17 +1,23 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
-const { ImapFlow } = require("imapflow");
 const path = require("path");
+const { ImapFlow } = require("imapflow");
 
 const app = express();
-app.use(cors());
 
-app.use(express.static(path.join(__dirname, "../inbox")));
+// 📁 Serve inbox frontend at /inbox/
+app.use("/inbox", express.static(path.join(__dirname, "../inbox")));
 
+// 🏠 Serve homepage at /
+app.get("/", (req, res) => {
+    const homepage = path.join(__dirname, "../index.html");
+    console.log("🧾 Serving homepage:", homepage);
+    res.sendFile(homepage);
+});
+
+// ✉️ Email API
 app.get("/api/fetch-email", async (req, res) => {
     const n = parseInt(req.query.n) || 1;
-
     const client = new ImapFlow({
         host: "imap.mail.me.com",
         port: 993,
@@ -32,10 +38,9 @@ app.get("/api/fetch-email", async (req, res) => {
         }
 
         const seq = total - n + 1;
-        const range = `${seq}:${seq}`;
         let email = {};
 
-        for await (let msg of client.fetch(range, { envelope: true })) {
+        for await (let msg of client.fetch(`${seq}:${seq}`, { envelope: true })) {
             email = {
                 from: msg.envelope.from?.map(f => `${f.name || ''} <${f.address}>`).join(", ") || "(unknown)",
                 to: msg.envelope.to?.map(f => `${f.name || ''} <${f.address}>`).join(", ") || "(unknown)",
@@ -44,11 +49,10 @@ app.get("/api/fetch-email", async (req, res) => {
             };
         }
 
-        console.log("📨 Sending email:", email);
-        await client.logout(); // ✅ do this before responding
-        res.json(email);       // ✅ respond once, after logout
+        await client.logout();
+        res.json(email);
     } catch (err) {
-        console.error("❌ IMAP fetch failed:", err);
+        console.error("❌ IMAP error:", err);
         res.status(500).json({ error: err.message });
     }
 });
