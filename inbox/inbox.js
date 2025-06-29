@@ -185,6 +185,10 @@ async function showMail() {
     document.getElementById('audio').play();
     document.getElementById("mailPreview").style.display = "none";
     document.getElementById("emailContentsContainer").style.display = "block";
+    document.getElementById("emailContents").innerHTML = "<p>loading email, nya~</p>";
+
+
+    //aaaaaaaAAAAAAAAA krill me
 
     if (!accessToken || !currentMessageId) {
         log("No message selected");
