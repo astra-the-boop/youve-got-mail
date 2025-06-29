@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Inbox - You've Got Mail!</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body style="background-color: #a17f5c">
-    <img src="../img/arrow.png" style="image-rendering: pixelated; position: fixed; right: 5rem; top: 20rem; width: 13rem">
-    <img src="../img/arrow.png" style="image-rendering: pixelated; position: fixed; left: 5rem; top: 20rem; width: 13rem; rotate: 180deg">
-    <div style="rotate: -5deg;">
+<script src="inbox.js"></script>
+<div id="mailPreview">
+<img src="../img/login.png" style="image-rendering: pixelated; position: fixed; top: 0rem; right: 0rem" onclick="login()">
 
-        <div style="position: absolute; left: 33rem; top: 2rem; max-width: 30rem"><h2 id="letterInfo">From: example@domain.com<br>To: astra.the.boop@icloud.com<br>Subject: This is a subject sdakfljslkdjcf sdkacl sadkcfnsad flnsadf njl</h2></div>
-        <img src="../img/mail.png" style="image-rendering: pixelated; width: 40rem; display: block; margin: 11rem auto auto auto">
+<div style="rotate: -5deg;">
 
-    </div>
-    <script src="inbox.js"></script>
+    <div style="position: absolute; left: 33rem; top: 2rem; max-width: 30rem"><h1 id="letterInfo">Please log in to view mail</h1></div>
+    <img src="../img/mail.png" style="image-rendering: pixelated; width: 40rem; display: block; margin: 11rem auto auto auto">
+
+</div>
+<img src="../img/arrow.png" onclick="nextEmail()" id="nextArrow" style="image-rendering: pixelated; position: fixed; right: 5rem; top: 20rem; width: 13rem">
+<img src="../img/arrow.png" onclick="prevEmail()" id="backArrow" style="image-rendering: pixelated; position: fixed; left: 5rem; top: 20rem; width: 13rem; rotate: 180deg">
+<img src="../img/mailOpener.png" style="image-rendering: pixelated; position: fixed; width: 22rem; bottom: 12rem; right: 20rem; rotate: 9deg" onclick="showMail()">
+</div>
 </body>
 </html>

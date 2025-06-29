@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>📬 Gmail Client (Frontend Only)</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<h1>📨 Gmail Frontend App</h1>
+<button onclick="login()">🔐 Sign In</button>
+<button onclick="listEmails()">📥 Show Emails</button>
+<button onclick="sendMail()">📤 Send Email</button>
+<pre id="output"></pre>
+
+<script>
+  const CLIENT_ID = "670454110741-kr4m3bm40ns8dbr2s10aqk4kemg4evqh.apps.googleusercontent.com";
+  let accessToken = null;
+  let tokenClient;
+
+  function login() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
+      callback: (token) => {
+        accessToken = token.access_token;
+        log("✅ Signed in!");
+      }
+    });
+    tokenClient.requestAccessToken();
+    listEmails();
+  }
+
+  function listEmails() {
+    if (!accessToken) return log("⚠️ Not signed in");
+
+    fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5", {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    })
+            .then(res => res.json())
+            .then(data => {
+              if (!data.messages) return log("📭 No messages found.");
+              data.messages.forEach(msg => {
+                fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata`, {
+                  headers: { Authorization: `Bearer ${accessToken}` }
+                })
+                        .then(res => res.json())
+                        .then(email => {
+                          const headers = email.payload.headers;
+                          const from = headers.find(h => h.name === "From")?.value;
+                          const subject = headers.find(h => h.name === "Subject")?.value;
+
+                        });
+              });
+            });
+  }
+
+  function sendMail() {
+    if (!accessToken) return log("⚠️ Not signed in");
+
+    const email = [
+      "To: your.email@example.com",
+      "Subject: Hello from JS!",
+      "",
+      "This was sent using the Gmail API + frontend only!"
+    ].join("\r\n");
+
+    const encoded = btoa(email).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+    fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ raw: encoded })
+    })
+            .then(res => res.json())
+            .then(data => {
+              if (data.id) log("✅ Email sent! ID: " + data.id);
+              else log("❌ Failed to send");
+            });
+  }
+
+  function log(msg) {
+    document.getElementById("output").textContent += msg + "\n";
+  }
+</script>
+</body>
+</html>
