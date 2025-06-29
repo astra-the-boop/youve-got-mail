@@ -9,11 +9,12 @@
 <script src="inbox.js"></script>
 <div id="mailPreview">
 <img src="../img/login.png" style="image-rendering: pixelated; position: fixed; top: 0rem; right: 0rem" onclick="login()">
-
+    <a href=".."><img src="../img/back.png" style="image-rendering: pixelated; position: fixed; top:0; left: 0"></a>
 <div style="rotate: -5deg;">
 
     <div style="position: absolute; left: 33rem; top: 2rem; max-width: 30rem"><h1 id="letterInfo">Please log in to view mail</h1></div>
     <img src="../img/mail.png" style="image-rendering: pixelated; width: 40rem; display: block; margin: 11rem auto auto auto">
+
 
 </div>
 <img src="../img/arrow.png" onclick="nextEmail()" id="nextArrow" style="image-rendering: pixelated; position: fixed; right: 5rem; top: 20rem; width: 13rem">
@@ -21,8 +22,10 @@
 <img src="../img/mailOpener.png" style="image-rendering: pixelated; position: fixed; width: 22rem; bottom: 12rem; right: 20rem; rotate: 9deg" onclick="showMail()">
 </div>
 <div style="display: none" id="emailContentsContainer">
-    <div style="width: 50rem; background-color: white; margin-left: auto; margin-right: auto; font-size: 1.5rem; padding: 5rem 5rem 5rem 5rem" id="emailContents">
+    <div style="width: 50rem; background-color: white; margin-left: auto; margin-right: auto; font-size: 1.5rem; padding: 5rem 5rem 5rem 5rem; word-wrap: break-word" id="emailContents">
+
     </div>
+    <img src="../img/back.png" style="image-rendering: pixelated; position: fixed; top: 0; left: 0;" onclick="document.getElementById('emailContentsContainer').style.display='none'; document.getElementById('mailPreview').style.display = 'block';">
 </div>
 </body>
 </html>
