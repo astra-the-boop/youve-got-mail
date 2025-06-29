@@ -3,6 +3,12 @@ let accessToken = null;
 let tokenClient;
 let n = 0;
 
+document.getElementById("mail").addEventListener("keydown", (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        sendMail()
+    }
+})
+
 function login() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,

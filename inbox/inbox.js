@@ -18,6 +18,26 @@ function login() {
     tokenClient.requestAccessToken();
 }
 
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
+        return;
+    }
+
+    if(e.key === "ArrowLeft"){
+        prevEmail();
+    }
+    if(e.key === "ArrowRight"){
+        nextEmail();
+    }
+    if(e.key === "Escape"){
+        document.getElementById('emailContentsContainer').style.display='none';
+        document.getElementById('mailPreview').style.display = 'block';
+    }
+    if(e.key === "Enter"){
+        showMail();
+    }
+})
+
 async function fetchMessageList() {
     const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100`, {
         headers: { Authorization: `Bearer ${accessToken}` }
