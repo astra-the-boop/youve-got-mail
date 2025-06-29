@@ -44,7 +44,10 @@ async function fetchMessageList() {
 
 function sendMail() {
     document.getElementById('audio1').play();
-    if (!accessToken) return log("Not signed in");
+    if (!accessToken) {
+        alert("mrrp, you havent logged in yet! :3c");
+        throw new Error("User not signed in.");
+    }
 
     const email = [
         `To: ${document.getElementById('recip').value.trim()}`,
