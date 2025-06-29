@@ -73,7 +73,7 @@ function nextEmail() {
 
 async function searchEmails() {
     const query = document.getElementById("searchInput").value;
-    document.getElementById("letterInfo").innerText = "Searching...";
+    document.getElementById("letterInfo").innerText = "searching,,, nya~";
 
     await fetchMessageList(query);
 
