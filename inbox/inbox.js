@@ -28,11 +28,13 @@ async function fetchMessageList() {
 
 
 function nextEmail() {
+    document.getElementById('audio').play();
     n++;
     listEmails(n);
 }
 
 function prevEmail() {
+    document.getElementById('audio').play();
     if (n > 0) {
         n--;
         listEmails(n);
@@ -40,8 +42,8 @@ function prevEmail() {
 }
 
 function listEmails(index) {
-    if (!accessToken) return log("⚠️ Not signed in");
-    if (!messageList.length) return log("📭 No messages loaded.");
+    if (!accessToken) return log("Not signed in");
+    if (!messageList.length) return log("No messages loaded.");
     if (index >= messageList.length) {
         log("No more messages.");
         return;
@@ -66,6 +68,7 @@ function listEmails(index) {
 }
 
 function showMail(){
+    document.getElementById('audio').play();
     document.getElementById("mailPreview").style.display = "none";
     document.getElementById("emailContentsContainer").style.display = "block";
     if (!accessToken || !currentMessageId) return log("No message selected");

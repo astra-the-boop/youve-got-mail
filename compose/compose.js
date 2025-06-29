@@ -2,7 +2,6 @@ const CLIENT_ID = "670454110741-kr4m3bm40ns8dbr2s10aqk4kemg4evqh.apps.googleuser
 let accessToken = null;
 let tokenClient;
 let n = 0;
-let currentMessageId;
 
 function login() {
     tokenClient = google.accounts.oauth2.initTokenClient({
@@ -29,6 +28,7 @@ async function fetchMessageList() {
 
 
 function sendMail() {
+    document.getElementById('audio1').play();
     if (!accessToken) return log("Not signed in");
 
     const email = [
