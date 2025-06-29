@@ -53,13 +53,12 @@ document.addEventListener('keydown', (e) => {
     }
 })
 
-async function fetchMessageList() {
-    const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100`, {
+async function fetchMessageList(query = "") {
+    const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100&q=${encodeURIComponent(query)}`, {
         headers: { Authorization: `Bearer ${accessToken}` }
     });
     const data = await res.json();
     messageList = data.messages || [];
-    originalMessageList = [...messageList];
 }
 
 
@@ -73,45 +72,19 @@ function nextEmail() {
 }
 
 async function searchEmails() {
-    const query = document.getElementById("searchInput").value.toLowerCase();
-    messageList = [...originalMessageList];
-    const filtered = [];
+    const query = document.getElementById("searchInput").value;
+    document.getElementById("letterInfo").innerText = "Searching...";
 
-    for (const msg of messageList) {
-        try {
-            const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata`, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            const email = await res.json();
+    await fetchMessageList(query);
 
-            if (!email.payload || !email.payload.headers) {
-                console.warn("Invalid email data for ID:", msg.id);
-                continue;
-            }
-
-            const headers = email.payload.headers;
-            const subject = headers.find(h => h.name === "Subject")?.value?.toLowerCase() || "";
-            const from = headers.find(h => h.name === "From")?.value?.toLowerCase() || "";
-
-            if (subject.includes(query) || from.includes(query)) {
-                filtered.push(msg);
-            }
-
-        } catch (err) {
-            console.error("Failed to fetch email:", err);
-        }
-    }
-
-    if (filtered.length === 0) {
-        document.getElementById("letterInfo").innerHTML = "No results found.";
+    if (!messageList.length) {
+        document.getElementById("letterInfo").innerText = "No results found.";
         document.getElementById("backArrow").style.display = "none";
         document.getElementById("nextArrow").style.display = "none";
-        return;
+    } else {
+        n = 0;
+        listEmails(n);
     }
-
-    messageList = filtered;
-    n = 0;
-    listEmails(n);
 }
 
 
