@@ -73,12 +73,12 @@ function nextEmail() {
 
 async function searchEmails() {
     const query = document.getElementById("searchInput").value;
-    document.getElementById("letterInfo").innerText = "searching,,, nya~";
+    document.getElementById("letterInfo").innerText = "searching, nya~..";
 
     await fetchMessageList(query);
 
     if (!messageList.length) {
-        document.getElementById("letterInfo").innerText = "No results found.";
+        document.getElementById("letterInfo").innerText = "no mail found 3: mrraw";
         document.getElementById("backArrow").style.display = "none";
         document.getElementById("nextArrow").style.display = "none";
     } else {
@@ -86,6 +86,7 @@ async function searchEmails() {
         listEmails(n);
     }
 }
+
 
 
 function prevEmail() {
