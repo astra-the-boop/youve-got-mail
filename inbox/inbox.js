@@ -234,8 +234,27 @@ async function showMail() {
         const attachmentHTML = await Promise.all(attachments.map(async (att) => {
             const filename = att.filename || "attachment";
             const mimeType = att.mimeType;
-            const data = await fetchAttachment(currentMessageId, att.body.attachmentId);
-            return `<p><a download="${filename}" href="data:${mimeType};base64,${data}">📎 ${filename}</a></p>`;
+            const base64 = await fetchAttachment(currentMessageId, att.body.attachmentId);
+
+            const byteCharacters = decodeBase64Url(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+
+            if (mimeType.startsWith("image/")) {
+                return `
+            <div style="margin-top:1rem">
+                <p><strong>${filename}</strong></p>
+                <img src="${url}" alt="${filename}" style="max-width:100%; height:auto; border:1px solid #ccc; margin-bottom: 0.5rem;"><br>
+                <a href="${url}" download="${filename}">📎 Download ${filename}</a>
+            </div>`;
+            } else {
+                return `<p><a href="${url}" download="${filename}">📎 ${filename}</a></p>`;
+            }
         }));
 
         document.getElementById("emailContents").innerHTML = decoded + attachmentHTML.join("");
@@ -268,15 +287,16 @@ function getPartsRecursively(data) {
 }
 
 function decodeBase64Url(data) {
-    const fixed = data.replace(/-/g, '+').replace(/_/g,'/');
-    const padding = '='.repeat((fixed.length - 4)%4);
-    try{
-        return atob(fixed+padding);
-    }catch(e){
-        console.error('failed to decode',e.message);
-        return 'error decoding body'
+    const fixed = data.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = fixed + '='.repeat((4 - fixed.length % 4) % 4);
+    try {
+        return atob(padded);
+    } catch (e) {
+        console.error("Base64 decode error:", e.message);
+        return '';
     }
 }
+
 
 
 function log(msg) {
