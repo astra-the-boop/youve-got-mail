@@ -34,6 +34,8 @@ function sendMail() {
     const email = [
         `To: ${document.getElementById('recip').value.trim()}`,
         `Subject: ${document.getElementById('subj').value.trim()}`,
+        `Cc: ${document.getElementById('cc').value.trim()}`,
+        `Bcc: ${document.getElementById('bcc').value.trim()}`,
         "",
         document.getElementById('mail').value
     ].join("\r\n");
