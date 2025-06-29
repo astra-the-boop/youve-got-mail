@@ -47,3 +47,12 @@ UI? Me.
 Icons? Also me.
 OAuth bugs? Also me, crying.
 I’m tired. Save me.
+
+cc. astra.the.boop@icloud.com if you need anythiing... or just dm me on my socials you prolly have them, just click on my gh profile ffs scjadka,s,dcfd,s krill me
+
+---
+
+### P.S.
+i'm going to throw an `[insert oddly specific item here]` at your face if you abuse my API key :sparkles: :3c :3c :3c :3c 
+
+god save me i am so fucking tired a,c,d,c,cs,a,c,c,c,d,c,ds,cf
