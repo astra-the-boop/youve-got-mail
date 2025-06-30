@@ -12,7 +12,7 @@ A playful, 90s-kids-software themed Gmail client!
 - Keyboard shortcuts!
 - Email searching for sender and subject
 - Attachments (bc i can't fix my attachment issues so this is the next best thing i can do)
-- Nya~
+- nyaa~
 
 ---
 
@@ -56,3 +56,5 @@ cc. astra.the.boop@icloud.com if you need anythiing... or just dm me on my socia
 i'm going to throw an `[insert oddly specific item here]` at your face if you abuse my API key :sparkles: :3c :3c :3c :3c 
 
 god save me i am so fucking tired a,c,d,c,cs,a,c,c,c,d,c,ds,cf
+
+(also check the console every once in a while, it might `fill you with determination`)
