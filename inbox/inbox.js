@@ -10,6 +10,7 @@ let nextPageToken = null;
 let prevPageTokens = [];
 
 function login() {
+    document.getElementById('audio2').play();
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
@@ -178,15 +179,44 @@ function showFullEmail() {
 
 let isShowingEmail = false;
 
+function buildEml(message) {
+    const headers = message.payload.headers || {};
+    const get = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || "";
+
+    const from = get("From");
+    const to = get("To");
+    const cc = get("Cc");
+    const subject = get("Subject");
+    const date = get("Date");
+    const mimeVer = "1.0";
+    const contentType = "text/plain; charset=UTF-8";
+
+    const parts = getPartsRecursively(message.payload);
+    const plain = parts.find(p => p.mimeType === "text/plain");
+    const bodyData = plain?.body?.data || message.payload.body?.data;
+    const body = decodeBase64Url(bodyData || "");
+
+    return [
+        `From: ${from}`,
+        `To: ${to}`,
+        cc ? `Cc: ${cc}` : "",
+        `Subject: ${subject}`,
+        `Date: ${date}`,
+        `MIME-Version: ${mimeVer}`,
+        `Content-Type: ${contentType}`,
+        ``,
+        body
+    ].join("\r\n");
+}
+
+
 async function showMail() {
     if (isShowingEmail) return;
     isShowingEmail = true;
 
-    document.getElementById('audio').play();
+    document.getElementById('audio1').play();
     document.getElementById("mailPreview").style.display = "none";
     document.getElementById("emailContentsContainer").style.display = "block";
-    document.getElementById("emailContents").innerHTML = "<p>loading email, nya~</p>";
-
 
     //aaaaaaaAAAAAAAAA krill me
 
@@ -202,10 +232,12 @@ async function showMail() {
         });
         const data = await res.json();
 
+
         const parts = getPartsRecursively(data.payload);
         const htmlPart = parts.find(p => p.mimeType === "text/html");
         const plainPart = parts.find(p => p.mimeType === "text/plain");
         let bodyData = htmlPart?.body?.data || plainPart?.body?.data || data.payload.body?.data;
+
 
         if (!bodyData) {
             log("No body content found.");
@@ -233,6 +265,8 @@ async function showMail() {
                     const url = URL.createObjectURL(blob);
 
                     inlineImages[cid] = `<a href="${url}" download="${filename}">📸 ${filename}</a>`;
+
+
                 }
             }
         }
@@ -263,9 +297,15 @@ async function showMail() {
             const url = URL.createObjectURL(blob);
 
             return `<p><a href="${url}" download="${filename}">📎 Download ${filename}</a></p>`;
+
         }));
 
         document.getElementById("emailContents").innerHTML = decoded + attachmentHTML.join("");
+        const emlContent = buildEml(data);
+        const emlBlob = new Blob([emlContent], { type: "message/rfc822" });
+        const emlUrl = URL.createObjectURL(emlBlob);
+        const emlLink = `<p><a href="${emlUrl}" download="message.eml"><button>Save as .eml</button></a></p>`;
+        document.getElementById("emailContents").innerHTML += emlLink;
 
         log("Email content loaded.");
     } catch (err) {
@@ -280,6 +320,7 @@ async function fetchAttachment(messageId, attachmentId) {
         headers: { Authorization: `Bearer ${accessToken}` }
     });
     const data = await res.json();
+
     return data.data; // already base64 encoded
 }
 

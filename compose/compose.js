@@ -19,6 +19,7 @@ document.addEventListener('keydown', (e) => {
     }});
 
 function login() {
+    document.getElementById("audio2").play();
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
@@ -43,7 +44,7 @@ async function fetchMessageList() {
 
 
 function sendMail() {
-    document.getElementById('audio1').play();
+    document.getElementById('audio3').play();
     if (!accessToken) {
         alert("mrrp, you havent logged in yet! :3c");
         throw new Error("User not signed in.");
