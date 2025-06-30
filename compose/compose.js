@@ -25,7 +25,10 @@ function login() {
         scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
         callback: (tokenResponse) => {
             accessToken = tokenResponse.access_token;
-            log("Signed in!");
+            log(```Sans:
+* nice.
+* you're in.
+[Signed in]```);
             fetchMessageList().then(() => listEmails(n));
         }
     });
@@ -72,7 +75,10 @@ function sendMail() {
         .then(res => res.json())
         .then(data => {
             if (data.id) alert("Email sent! ID: " + data.id);
-            else log("Failed to send");
+            else log(```Sans:
+* woops.
+* guess that one didn’t make it.
+[Failed to send]```);
         });
 
 
