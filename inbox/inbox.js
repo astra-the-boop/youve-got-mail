@@ -118,7 +118,11 @@ async function prevEmail() {
                 n = messageList.length - 1;
             }
              else {
-                log("You're at the first message.");
+                log(```Sans:
+* this is it.
+* the very beginning.
+* no goin’ back, kid.
+[You're at the first email]```);
                 n = 0;
             }
         }
@@ -131,10 +135,19 @@ function listEmails(index) {
     if (isFetchingEmail) return;
     isFetchingEmail = true;
 
-    if (!accessToken) return log("Not signed in");
-    if (!messageList.length) return log("No messages loaded.");
+    if (!accessToken) return log(```Sans:
+* door’s locked.
+* try signin’ in first, pal.
+[Not signed in]```);
+    if (!messageList.length) return log(```Sans:
+* nothing to see here.
+* yet.
+[No emails loaded]```);
     if (index >= messageList.length) {
-        log("No more messages.");
+        log(```Sans:
+* that’s all, folks.
+* bone dry.
+[No more messages]```);
         isFetchingEmail = false;
         return;
     }
@@ -160,7 +173,10 @@ function listEmails(index) {
                 index < messageList.length - 1 || nextPageToken ? "block" : "none";
 
         })
-        .catch(err => log("Error loading message: " + err.message))
+        .catch(err => log(```Sans:
+* something’s busted.
+* not my fault this time.
+[Error: ${err.message}```))
         .finally(() => {
             isFetchingEmail = false;
         });
@@ -221,7 +237,10 @@ async function showMail() {
     //aaaaaaaAAAAAAAAA krill me
 
     if (!accessToken || !currentMessageId) {
-        log("No message selected");
+        log(```Sans:
+* pick one.
+* i ain’t a mind reader. (…usually.)
+[No messages selected]```);
         isShowingEmail = false;
         return;
     }
@@ -240,7 +259,10 @@ async function showMail() {
 
 
         if (!bodyData) {
-            log("No body content found.");
+            log(```Sans:
+* found the skeleton.
+* no guts, though.
+[No body content found]```);
             return;
         }
         const inlineImages = {};
@@ -307,9 +329,15 @@ async function showMail() {
         const emlLink = `<p><a href="${emlUrl}" download="message.eml"><button>Save as .eml</button></a></p>`;
         document.getElementById("emailContents").innerHTML += emlLink;
 
-        log("Email content loaded.");
+        log(```Sans:
+* sweet.
+* got it all in one piece.
+[Email content loaded]```);
     } catch (err) {
-        log("Error fetching message content: " + err.message);
+        log(```Sans:
+* welp.
+* that email’s toast.
+[Error fetching email content]```);
     } finally {
         isShowingEmail = false;
     }
