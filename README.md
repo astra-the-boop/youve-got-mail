@@ -19,7 +19,7 @@ A playful, 90s-kids-software themed Gmail client!
 ### Host it yourself
 1. **Clone the repo!**
 ```bash
-git clone https://github.com/your-username/youve-got-mail.git
+git clone https://github.com/astra-the-boop/youve-got-mail.git
 ```
 
 2. **Set up your own Gmail Oath Client (please don't freeload off of me, i'm broke)**
